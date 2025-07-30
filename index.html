@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Qlik OAuth Embedding</title>
+  <script>
+    const tenantUrl = "https://keyruspt.eu.qlikcloud.com.qlikcloud.com";
+    const clientId = "1bcfdbe59d689c9dfd05f168ff04f6a8";
+    const redirectUri = window.location.origin + window.location.pathname;
+
+    function getAccessTokenFromUrl() {
+      const hash = window.location.hash;
+      if (hash) {
+        const params = new URLSearchParams(hash.substring(1));
+        return params.get("access_token");
+      }
+      return null;
+    }
+
+    function redirectToAuth() {
+      const authUrl = `${tenantUrl}/login/oauth2/authorize?client_id=${clientId}&response_type=token&redirect_uri=${encodeURIComponent(redirectUri)}&scope=openid profile email`;
+      window.location.href = authUrl;
+    }
+
+    const token = getAccessTokenFromUrl();
+
+    if (!token) {
+      redirectToAuth();
+    } else {
+      document.addEventListener("DOMContentLoaded", () => {
+        const iframe = document.createElement("iframe");
+        iframe.src = `${tenantUrl}/single/?appid=2600467e-7e6c-4c36-9fb4-2139caa1cb4d&sheet=pwn&theme=classic&qlik-ticket=${token}`;
+        iframe.style = "width: 100%; height: 600px; border: none;";
+        document.body.appendChild(iframe);
+      });
+    }
+  </script>
+</head>
+<body>
+  <h2>Aplicación Qlik Sense embebida con OAuth</h2>
+</body>
+</html>
