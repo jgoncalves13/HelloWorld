@@ -56,12 +56,12 @@
     async function connectAndEmbed() {
       const accessToken = await getAccessToken();
 
- ///     if (!accessToken) {
-  ///      document.getElementById("result").innerText = "Não foi possível obter o token";
- ///       return;
-  ///    }
+      if (!accessToken) {
+        document.getElementById("result").innerText = "Não foi possível obter o token";
+        return;
+      }
 
-   ///   document.getElementById("result").innerText = "Token obtido. Incorporando a aplicação...";
+      document.getElementById("result").innerText = "Token obtido. Incorporando a aplicação...";
 
       // Ajusta estos valores con tu app y hoja reales
   ///    const appId = "2600467e-7e6c-4c36-9fb4-2139caa1cb4d";
