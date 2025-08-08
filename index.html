@@ -1,165 +1,80 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Prueba Qlik Cloud - Impersonation (M2M) — HTML solo</title>
+  <meta charset="UTF-8" />
+  <title>Embed Qlik App using OAuth M2M</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; max-width: 1100px; }
-    button { padding: 8px 12px; margin: 6px 0; }
-    textarea, input { width: 100%; box-sizing: border-box; padding: 8px; margin-top: 6px; }
-    iframe { width: 100%; height: 800px; border: 1px solid #ccc; margin-top: 12px; }
-    #result { white-space: pre-wrap; background: #f7f7f7; padding: 10px; margin-top: 12px; border-radius: 6px; }
-    label { font-weight: bold; margin-top: 10px; display:block; }
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    iframe { width: 100%; height: 1000px; border: none; margin-top: 20px; }
+    #result { margin-top: 20px; white-space: pre-wrap; }
   </style>
 </head>
 <body>
-  <h1>Prueba: Qlik Cloud Impersonation (único HTML)</h1>
-
-  <p><strong>ADVERTENCIA:</strong> Este ejemplo guarda <em>client_secret</em> en el HTML — solo para pruebas locales.</p>
-
-  <label>Tenant (ej: keyruspt.eu.qlikcloud.com)</label>
-  <input id="tenant" value="keyruspt.eu.qlikcloud.com" />
-
-  <label>Client ID</label>
-  <input id="client_id" value="f6706182174fc70842b6161db71246ba" />
-
-  <label>Client Secret</label>
-  <input id="client_secret" value="0cb9d1b9c63450eecd4143ffa161f53154ed8eafc07d9658c0e261d7775688a9" />
-
-  <label>App ID</label>
-  <input id="appId" value="2600467e-7e6c-4c36-9fb4-2139caa1cb4d" />
-
-  <label>Sheet ID (opcional)</label>
-  <input id="sheetId" value="pwn" />
-
-  <label>user_lookup - campo</label>
-  <input id="userField" value="subject" />
-
-  <label>user_lookup - valor (usuario a impersonar)</label>
-  <input id="userValue" value="cavida.pt/ivida.hugo.santos" />
-
-  <div style="margin-top:10px;">
-    <button onclick="doTokenAndEmbed()">Obtener token y embeber</button>
-    <button onclick="clearAll()">Limpiar / Reset</button>
-  </div>
-
-  <div id="result">Estado: esperando acción...</div>
-
-  <iframe id="qlikApp" style="display:none;"></iframe>
+  <h1>Embed Qlik App con OAuth M2M</h1>
+  <button onclick="connectAndEmbed()">Conectar e Embutir Aplicação</button>
+  <div id="result"></div>
+  <iframe id="qlikApp" style="display: none;"></iframe>
 
   <script>
-    async function getAccessTokenDirect(tenant, clientId, clientSecret, userField, userValue) {
-      // Construimos body x-www-form-urlencoded; user_lookup va como JSON string
-      const body = new URLSearchParams();
-      body.append("client_id", clientId);
-      body.append("client_secret", clientSecret);
-      body.append("grant_type", "urn:qlik:oauth:user-impersonation");
-      body.append("user_lookup", JSON.stringify({ field: userField, value: userValue }));
-      body.append("scope", "user_default");
-
-      const url = `https://${tenant}/oauth/token`;
-
+    async function getAccessToken() {
       const options = {
         method: "POST",
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "Accept": "application/json"
+          "Content-Type": "application/json",
+          "Accept": "application/json",
         },
-        body: body.toString()
+        body: JSON.stringify({
+          client_id: "f6706182174fc70842b6161db71246ba",
+          client_secret: "0cb9d1b9c63450eecd4143ffa161f53154ed8eafc07d9658c0e261d7775688a9",
+          //auth_type="Oauth2",
+          grant_type: "urn:qlik:oauth:user-impersonation",
+          user_lookup: {
+                 field: "subject", // puede ser 'email', 'subject', 'userId'
+                 value: "cavida.pt/ivida.hugo.santos" // ? usuario del tenant Qlik
+                 //value: "67adbf58f40067e3dae55c0d" // ? usuario del tenant Qlik
+                       },
+          scope: "user_default"
+          //grant_type: "client_credentials",
+          //impersonated_user: "Juan Gonçalves",
+          //scope: "user_default admin_classic impersonate"
+        })
       };
 
-      const resp = await fetch(url, options);
-      // si falla por CORS o 4xx/5xx, lo manejamos fuera
-      const text = await resp.text();
-      try {
-        return { ok: resp.ok, status: resp.status, json: JSON.parse(text) };
-      } catch (e) {
-        return { ok: resp.ok, status: resp.status, text };
+      const response = await fetch("https://keyruspt.eu.qlikcloud.com/oauth/token", options);
+
+      if (response.ok) {
+        const tokenInfo = await response.json();
+        return tokenInfo.access_token;
+      } else {
+        console.error("Erro ao obter token");
+        return null;
       }
     }
 
-    async function doTokenAndEmbed() {
-      const tenant = document.getElementById("tenant").value.trim();
-      const clientId = document.getElementById("client_id").value.trim();
-      const clientSecret = document.getElementById("client_secret").value.trim();
-      const appId = document.getElementById("appId").value.trim();
-      const sheetId = document.getElementById("sheetId").value.trim();
-      const userField = document.getElementById("userField").value.trim();
-      const userValue = document.getElementById("userValue").value.trim();
+    async function connectAndEmbed() {
+      const accessToken = await getAccessToken();
 
-      const resultEl = document.getElementById("result");
-      resultEl.innerText = "Solicitando token... (puede fallar si el tenant bloquea CORS)";
-
-      let tokenResp;
-      try {
-        tokenResp = await getAccessTokenDirect(tenant, clientId, clientSecret, userField, userValue);
-      } catch (err) {
-        resultEl.innerText = "Error en fetch: " + err.toString() + "\n\nSi es CORS, considera usar un proxy local o extensión para pruebas.";
+      if (!accessToken) {
+        document.getElementById("result").innerText = "Não foi possível obter o token";
         return;
       }
 
-      if (!tokenResp.ok) {
-        // Muestra respuesta para depuración
-        resultEl.innerText = `Token request falló (status ${tokenResp.status}). Respuesta:\n\n${JSON.stringify(tokenResp.json ?? tokenResp.text, null, 2)}\n\nSi ves un error CORS en la consola, prueba el proxy local (instrucciones abajo).`;
-        return;
-      }
+      document.getElementById("result").innerText = "Token obtido. Incorporando a aplicação...";
 
-      const tokenInfo = tokenResp.json;
-      if (!tokenInfo || !tokenInfo.access_token) {
-        resultEl.innerText = "No se recibió access_token. Respuesta:\n\n" + JSON.stringify(tokenInfo, null, 2);
-        return;
-      }
+      // Ajusta estos valores con tu app y hoja reales
+      const appId = "2600467e-7e6c-4c36-9fb4-2139caa1cb4d";
+      const sheetId = "pwn"; // Opcional
+      const tenant = "keyruspt.eu.qlikcloud.com";
 
-      const accessToken = tokenInfo.access_token;
-      resultEl.innerText = "Token obtenido correctamente. Expira en: " + (tokenInfo.expires_in ? tokenInfo.expires_in + "s" : "desconocido") + "\n\nToken (oculto parcialmente): " + accessToken.slice(0,20) + "…";
-
-      // Construimos URL del iframe (usar `/single/` para embed)
-      const iframeUrl = `https://${tenant}/single/?appid=${appId}${sheetId ? "&sheet=" + sheetId : ""}&opt=ctxmenu,currsel&theme=classic&qlik-token=${encodeURIComponent(accessToken)}`;
+      const iframeUrl = `https://${tenant}/single/?appid=${appId}&sheet=${sheetId}&opt=ctxmenu,currsel&theme=classic&qlik-token=${accessToken}`;
+      //const iframeUrl = `https://${tenant}/sense/app/${appId}&opt=ctxmenu,currsel&theme=classic&qlik-token=${accessToken}`;
+      //const iframeUrl = `https://keyruspt.eu.qlikcloud.com/sense/app/2600467e-7e6c-4c36-9fb4-2139caa1cb4d/sheet/pwn/state/analysis&qlik-token=${accessToken}`;
+      //https://keyruspt.eu.qlikcloud.com/sense/app/2600467e-7e6c-4c36-9fb4-2139caa1cb4d/sheet/pwn/state/analysis&
 
       const iframe = document.getElementById("qlikApp");
       iframe.src = iframeUrl;
       iframe.style.display = "block";
     }
-
-    function clearAll() {
-      document.getElementById("result").innerText = "Limpiado.";
-      document.getElementById("qlikApp").style.display = "none";
-      document.getElementById("qlikApp").src = "about:blank";
-    }
   </script>
-
-  <hr />
-  <h3>Notas / solución alternativa si hay errores CORS</h3>
-  <p>Si la petición al endpoint <code>/oauth/token</code> falla por CORS (muy probable en muchos tenants), ejecuta un pequeño proxy local que reenvíe la petición desde tu máquina (a continuación un ejemplo Node.js simple).</p>
-
-  <pre>
-  // server-proxy.js (Node, solo para pruebas locales)
-  // 1) npm init -y
-  // 2) npm i express axios cors
-  // 3) node server-proxy.js
-  const express = require('express');
-  const axios = require('axios');
-  const cors = require('cors');
-  const app = express();
-  app.use(cors());
-  app.use(express.json());
-  app.post('/token', async (req, res) => {
-    // reenvía body tal cual a https://{tenant}/oauth/token
-    try {
-      const tenant = req.body.tenant; // pásalo desde el fetch
-      const resp = await axios.post(`https://${tenant}/oauth/token`, new URLSearchParams(req.body.body).toString(), {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-      });
-      res.status(resp.status).send(resp.data);
-    } catch (e) {
-      if (e.response) res.status(e.response.status).send(e.response.data);
-      else res.status(500).send({ error: e.message });
-    }
-  });
-  app.listen(3000, ()=> console.log('proxy listening on http://localhost:3000'));
-  </pre>
-
-  <p>Con ese proxy podrías modificar el HTML para enviar la petición a <code>http://localhost:3000/token</code> en vez de directamente al tenant.</p>
-
 </body>
 </html>
