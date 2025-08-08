@@ -67,8 +67,10 @@
       const appId = "2600467e-7e6c-4c36-9fb4-2139caa1cb4d";
       const sheetId = "pwn"; // Opcional
       const tenant = "keyruspt.eu.qlikcloud.com";
+      const webIntegrationId = "F5lgGsalXWNob9SEj1n-PuH-l93y9Ojk"; // pega aquí tu Web Integration ID
 
-      const iframeUrl = `https://${tenant}/single/?appid=${appId}&sheet=${sheetId}&opt=ctxmenu,currsel&theme=classic&qlik-token=${accessToken}`;
+      const iframeUrl = `https://${tenant}/single/?appid=${appId}&sheet=${sheetId}&opt=ctxmenu,currsel&theme=classic&qlik-token=${accessToken}&qlik-web-integration-id=${webIntegrationId}`;
+      //const iframeUrl = `https://${tenant}/single/?appid=${appId}&sheet=${sheetId}&opt=ctxmenu,currsel&theme=classic&qlik-token=${accessToken}`;
       //const iframeUrl = `https://${tenant}/sense/app/${appId}&opt=ctxmenu,currsel&theme=classic&qlik-token=${accessToken}`;
       //const iframeUrl = `https://keyruspt.eu.qlikcloud.com/sense/app/2600467e-7e6c-4c36-9fb4-2139caa1cb4d/sheet/pwn/state/analysis&qlik-token=${accessToken}`;
       //https://keyruspt.eu.qlikcloud.com/sense/app/2600467e-7e6c-4c36-9fb4-2139caa1cb4d/sheet/pwn/state/analysis&
