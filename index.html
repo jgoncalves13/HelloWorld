@@ -29,13 +29,13 @@
           //auth_type="Oauth2",
           grant_type: "urn:qlik:oauth:user-impersonation",
           user_lookup: {
+                //field: "userId", // puede ser 'email', 'subject', 'userId'
+                //value: "67adbf58f40067e3dae55c0d" // ? usuario del tenant Qlik 
                 field: "subject", // puede ser 'email', 'subject', 'userId'
-                value: "auth0|2fd068eb38b1aeac83b474e6117e37793d369a1fc64f92cf930535571fd5c5b8" // ? usuario del tenant Qlik 
-                //field: "subject", // puede ser 'email', 'subject', 'userId'
-                //value: "cavida.pt/ivida.hugo.santos" // ? usuario del tenant Qlik
+                value: "cavida.pt/ivida.hugo.santos" // ? usuario del tenant Qlik
                  //value: "67adbf58f40067e3dae55c0d" // ? usuario del tenant Qlik
                        },
-          scope: "user_default frame-ancestors admin_classic apps"
+          scope: "user_default frame-ancestors"
           //grant_type: "client_credentials",
           //impersonated_user: "Juan Gonçalves",
           //scope: "user_default admin_classic impersonate"
@@ -64,14 +64,10 @@
       document.getElementById("result").innerText = "Token obtido. Incorporando a aplicação...";
 
       // Ajusta estos valores con tu app y hoja reales
-      //const appId = "2600467e-7e6c-4c36-9fb4-2139caa1cb4d";
-      const appId = "1cca6f73-04b9-4f6f-8915-7408eae55fda";
-      //const sheetId = "pwn"; // Opcional
-      const sheetId = "qrNSBP"; // Opcional
+      const appId = "2600467e-7e6c-4c36-9fb4-2139caa1cb4d";
+      const sheetId = "pwn"; // Opcional
       const tenant = "keyruspt.eu.qlikcloud.com";
 
-      
-      //const iframeUrl = "https://keyruspt.eu.qlikcloud.com/single/?appid=2600467e-7e6c-4c36-9fb4-2139caa1cb4d&sheet=pwn&theme=horizon&opt=ctxmenu,currsel";
       const iframeUrl = `https://${tenant}/single/?appid=${appId}&sheet=${sheetId}&opt=ctxmenu,currsel&theme=classic&qlik-token=${accessToken}`;
       //const iframeUrl = `https://${tenant}/sense/app/${appId}&opt=ctxmenu,currsel&theme=classic&qlik-token=${accessToken}`;
       //const iframeUrl = `https://keyruspt.eu.qlikcloud.com/sense/app/2600467e-7e6c-4c36-9fb4-2139caa1cb4d/sheet/pwn/state/analysis&qlik-token=${accessToken}`;
@@ -81,3 +77,6 @@
       iframe.src = iframeUrl;
       iframe.style.display = "block";
     }
+  </script>
+</body>
+</html>
