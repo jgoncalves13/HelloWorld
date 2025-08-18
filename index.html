@@ -5,8 +5,7 @@
 <title>Embed Qlik Sense App con OAuth M2M y Impersonation</title>
 <style>
     body { font-family: Arial, sans-serif; margin: 40px; }
-    //iframe { width: 100%; height: 900px; border: none; margin-top: 20px; }
-    iframe { width: 90%; height: 92%; border: none; margin-top: 0px; }
+    iframe { width: 100%; height: 900px; border: none; margin-top: 20px; }
     #result { margin-top: 20px; white-space: pre-wrap; color: green; }
     #error { margin-top: 20px; color: red; white-space: pre-wrap; }
 </style>
@@ -57,15 +56,12 @@
         document.getElementById("result").innerText = "Token obtenido correctamente. Cargando app...";
  
         const tenant = "keyruspt.eu.qlikcloud.com";
-        //const appId = "2600467e-7e6c-4c36-9fb4-2139caa1cb4d";
-        //const sheetId = "pwn"; // Opcional
         const appId = "7c30b852-4dd2-4b04-b90a-cbfebd3ca207";
         const sheetId = "XwLsPUk"; // Opcional
         const webIntegrationId = "F5lgGsalXWNob9SEj1n-PuH-l93y9Ojk";
  
-        //const iframeUrl = `https://${tenant}/single/?appid=${appId}&sheet=${sheetId}&opt=ctxmenu,currsel,nochrome,noselections&theme=classic&qlik-token=${accessToken}&qlik-web-integration-id=${webIntegrationId}`;
-          const iframeUrl = `https://${tenant}/single/?appid=${appId}&theme=classic&qlik-token=${accessToken}&qlik-web-integration-id=${webIntegrationId}`;
-//<iframe src="https://keyruspt.eu.qlikcloud.com/single/?appid=7c30b852-4dd2-4b04-b90a-cbfebd3ca207&sheet=XwLsPUk&theme=horizon&opt=ctxmenu,currsel" style="border:none;width:100%;height:100%;"></iframe> 
+        const iframeUrl = `https://${tenant}/single/?appid=${appId}&sheet=${sheetId}&opt=ctxmenu,currsel&theme=classic&qlik-token=${accessToken}&qlik-web-integration-id=${webIntegrationId}`;
+ 
         const iframe = document.getElementById("qlikApp");
         iframe.src = iframeUrl;
         iframe.style.display = "block";
