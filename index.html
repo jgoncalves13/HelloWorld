@@ -61,8 +61,8 @@
         const webIntegrationId = "F5lgGsalXWNob9SEj1n-PuH-l93y9Ojk";
  
         //const iframeUrl = `https://${tenant}/single/?appid=${appId}&sheet=${sheetId}&opt=ctxmenu,currsel&theme=classic&qlik-token=${accessToken}&qlik-web-integration-id=${webIntegrationId}`;
-          const iframeUrl = `https://${tenant}/single/?appid=${appId}&sheet=${sheetId}&opt=ctxmenu&theme=classic&qlik-token=${accessToken}&qlik-web-integration-id=${webIntegrationId}`;
- 
+          const iframeUrl = `https://${tenant}/sense/?appid=${appId}`;
+        //https://keyruspt.eu.qlikcloud.com/sense/app/7c30b852-4dd2-4b04-b90a-cbfebd3ca207
         const iframe = document.getElementById("qlikApp");
         iframe.src = iframeUrl;
         iframe.style.display = "block";
