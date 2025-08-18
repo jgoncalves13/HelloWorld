@@ -60,7 +60,8 @@
         const sheetId = "XwLsPUk"; // Opcional
         const webIntegrationId = "F5lgGsalXWNob9SEj1n-PuH-l93y9Ojk";
  
-        const iframeUrl = `https://${tenant}/single/?appid=${appId}&sheet=${sheetId}&opt=ctxmenu,currsel&theme=classic&qlik-token=${accessToken}&qlik-web-integration-id=${webIntegrationId}`;
+        //const iframeUrl = `https://${tenant}/single/?appid=${appId}&sheet=${sheetId}&opt=ctxmenu,currsel&theme=classic&qlik-token=${accessToken}&qlik-web-integration-id=${webIntegrationId}`;
+          const iframeUrl = `https://${tenant}/single/?appid=${appId}&sheet=${sheetId}&opt=ctxmenu&theme=classic&qlik-token=${accessToken}&qlik-web-integration-id=${webIntegrationId}`;
  
         const iframe = document.getElementById("qlikApp");
         iframe.src = iframeUrl;
